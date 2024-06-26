@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Competition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .image-container img {
+            max-width: 45%;
+            margin: 0 10px;
+        }
+        .upload-form {
+            margin-top: 20px;
+        }
+        .winner {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Photo Competition</h1>
+    
+    <div class="upload-form">
+        <input type="file" id="imageUpload" accept="image/*">
+        <button onclick="uploadImage()">Upload Image</button>
+    </div>
+    
+    <div class="image-container">
+        <img id="image1" src="" alt="Image 1">
+        <img id="image2" src="" alt="Image 2">
+    </div>
+    
+    <div>
+        <button onclick="voteForImage(1)">Vote for Image 1</button>
+        <button onclick="voteForImage(2)">Vote for Image 2</button>
+    </div>
+    
+    <div class="winner" id="winner"></div>
+
+    <script>
+        let images = [];
+        let votes = {};
+        let currentIndex = 0;
+
+        function uploadImage() {
+            const fileInput = document.getElementById('imageUpload');
+            if (fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imageUrl = event.target.result;
+                    images.push(imageUrl);
+                    votes[imageUrl] = 0;
+                    if (images.length === 2) {
+                        displayImages();
+                    }
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function displayImages() {
+            document.getElementById('image1').src = images[currentIndex % images.length];
+            document.getElementById('image2').src = images[(currentIndex + 1) % images.length];
+        }
+
+        function voteForImage(imageIndex) {
+            const selectedImage = images[(currentIndex + imageIndex - 1) % images.length];
+            votes[selectedImage]++;
+            currentIndex++;
+            if (currentIndex >= images.length) {
+                declareWinner();
+            } else {
+                displayImages();
+            }
+        }
+
+        function declareWinner() {
+            let maxVotes = 0;
+            let winnerImage = '';
+            for (let imageUrl in votes) {
+                if (votes[imageUrl] > maxVotes) {
+                    maxVotes = votes[imageUrl];
+                    winnerImage = imageUrl;
+                }
+            }
+            document.getElementById('winner').innerText = `Winner: ${winnerImage}`;
+        }
+    </script>
+</body>
+</html>
